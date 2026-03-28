@@ -32,6 +32,16 @@ def add_costume(args):
         args.name, args.budget))
 
 
+def list(args):
+    data = load_data()
+    if not data:
+        print("No cosplays yet!")
+        return
+    for name, info in data.items():
+        print("- {} | {} | budget: {}€".format(name,
+              info["status"], info["budget"]))
+
+
 parser = argparse.ArgumentParser(description="theWorkshop - cosplay tracker")
 subparsers = parser.add_subparsers(dest="command")
 
@@ -39,9 +49,13 @@ add_parser = subparsers.add_parser("add", help="Add a new cosplay")
 add_parser.add_argument("name", type=str)
 add_parser.add_argument("--budget", type=float, required=True)
 
+subparsers.add_parser("list", help="List all cosplays")
+
 args = parser.parse_args()
 
 if args.command == "add":
     add_costume(args)
+elif args.command == "list":
+    list(args)
 else:
     parser.print_help()

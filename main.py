@@ -151,3 +151,6 @@ elif args.command == "delete":
     delete_costume(args)
 else:
     parser.print_help()
+
+
+# wait, I just realized idk how to use a fucking API key, is it hard?

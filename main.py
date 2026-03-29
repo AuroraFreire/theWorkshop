@@ -95,6 +95,21 @@ def add_material(args):
     print("Added {} ({}€) to {}".format(args.material, args.cost, args.name))
 
 
+def delete_costume(args):
+    data = load_data()
+    if args.name not in data:
+        print("{} not found :/".format(args.name))
+        return
+    confirm = input(
+        "are u sure you want to delete {}? (y/n): ".format(args.name))
+    if confirm.lower() != "y":
+        print("cancelled!")
+        return
+    del data[args.name]
+    save_data(data)
+    print("Deleted {}!".format(args.name))
+
+
 parser = argparse.ArgumentParser(description="theWorkshop - cosplay tracker")
 subparsers = parser.add_subparsers(dest="command")
 
@@ -117,6 +132,9 @@ material_parser.add_argument("name", type=str)
 material_parser.add_argument("material", type=str)
 material_parser.add_argument("--cost", type=float, required=True)
 
+delete_parser = subparsers.add_parser("delete", help="Delete a cosplay")
+delete_parser.add_argument("name", type=str)
+
 args = parser.parse_args()
 
 if args.command == "add":
@@ -129,5 +147,7 @@ elif args.command == "status":
     update_status(args)
 elif args.command == "material":
     add_material(args)
+elif args.command == "delete":
+    delete_costume(args)
 else:
     parser.print_help()

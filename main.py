@@ -134,10 +134,15 @@ def convert_costume(args):
         return
     rate = rates[target]
     print("1€ = {} {}".format(rate, target))
-    print("Budget: {} {}".format(round(info["budget"] * rate, 2), target))
-    print("Spent: {} {}".format(round(spent * rate, 2), target))
-    print("Remaining: {} {}".format(
-        round((info["budget"] - spent) * rate, 2), target))
+    if args.budget_only:
+        print("Budget: {} {}".format(round(info["budget"] * rate, 2), target))
+    elif args.materials_only:
+        print("Spent: {} {}".format(round(spent * rate, 2), target))
+    else:
+        print("Budget: {} {}".format(round(info["budget"] * rate, 2), target))
+        print("Spent: {} {}".format(round(spent * rate, 2), target))
+        print("Remaining: {} {}".format(
+            round((info["budget"] - spent) * rate, 2), target))
 
 
 parser = argparse.ArgumentParser(description="theWorkshop - cosplay tracker")
@@ -172,6 +177,12 @@ convert_parser.add_argument("--to", type=str, required=True)
 convert_parser.add_argument("--api-key", type=str,
                             required=False, default=None)
 
+group = convert_parser.add_mutually_exclusive_group()
+group.add_argument("--budget-only", action="store_true",
+                   help="Only show budget conversion")
+group.add_argument("--materials-only", action="store_true",
+                   help="Only show materials/spent conversion")
+
 args = parser.parse_args()
 
 if args.command == "add":
@@ -190,5 +201,3 @@ elif args.command == "convert":
     convert_costume(args)
 else:
     parser.print_help()
-
-# yup, it wasnt that hard

@@ -1,6 +1,7 @@
 import argparse
 import os
 import json
+import requests
 
 DATA_FILE = "data.json"
 
@@ -110,6 +111,35 @@ def delete_costume(args):
     print("Deleted {}!".format(args.name))
 
 
+def convert_costume(args):
+    data = load_data()
+    if args.name not in data:
+        print("{} not found :/".format(args.name))
+        return
+    api_key = args.api_key or os.environ.get("EXCHANGE_API_KEY")
+    if not api_key:
+        print("no api key! use --api-key or set the EXCHANGE_API_KEY environment variable")
+        return
+    info = data[args.name]
+    spent = sum(m["cost"] for m in info["materials"])
+    url = "https://v6.exchangerate-api.com/v6/{}/latest/EUR".format(api_key)
+    response = requests.get(url)
+    if response.status_code != 200:
+        print("failed to fetch exchange rates :/")
+        return
+    rates = response.json()["conversion_rates"]
+    target = args.to.upper()
+    if target not in rates:
+        print("{} is not a valid currency!".format(target))
+        return
+    rate = rates[target]
+    print("1€ = {} {}".format(rate, target))
+    print("Budget: {} {}".format(round(info["budget"] * rate, 2), target))
+    print("Spent: {} {}".format(round(spent * rate, 2), target))
+    print("Remaining: {} {}".format(
+        round((info["budget"] - spent) * rate, 2), target))
+
+
 parser = argparse.ArgumentParser(description="theWorkshop - cosplay tracker")
 subparsers = parser.add_subparsers(dest="command")
 
@@ -135,6 +165,13 @@ material_parser.add_argument("--cost", type=float, required=True)
 delete_parser = subparsers.add_parser("delete", help="Delete a cosplay")
 delete_parser.add_argument("name", type=str)
 
+convert_parser = subparsers.add_parser(
+    "convert", help="Convert cosplay costs to another currency")
+convert_parser.add_argument("name", type=str)
+convert_parser.add_argument("--to", type=str, required=True)
+convert_parser.add_argument("--api-key", type=str,
+                            required=False, default=None)
+
 args = parser.parse_args()
 
 if args.command == "add":
@@ -149,8 +186,7 @@ elif args.command == "material":
     add_material(args)
 elif args.command == "delete":
     delete_costume(args)
+elif args.command == "convert":
+    convert_costume(args)
 else:
     parser.print_help()
-
-
-# wait, I just realized idk how to use a fucking API key, is it hard?

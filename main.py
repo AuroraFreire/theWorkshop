@@ -82,6 +82,19 @@ def update_status(args):
     print("Updated {} status to {}".format(args.name, status_map[args.set]))
 
 
+def add_material(args):
+    data = load_data()
+    if args.name not in data:
+        print("{} not found :/".format(args.name))
+        return
+    data[args.name]["materials"].append({
+        "name": args.material,
+        "cost": args.cost
+    })
+    save_data(data)
+    print("Added {} ({}€) to {}".format(args.material, args.cost, args.name))
+
+
 parser = argparse.ArgumentParser(description="theWorkshop - cosplay tracker")
 subparsers = parser.add_subparsers(dest="command")
 
@@ -98,6 +111,12 @@ status_parser = subparsers.add_parser("status", help="Update cosplay status")
 status_parser.add_argument("name", type=str)
 status_parser.add_argument("--set", type=int, required=True)
 
+material_parser = subparsers.add_parser(
+    "material", help="Add a material to a cosplay")
+material_parser.add_argument("name", type=str)
+material_parser.add_argument("material", type=str)
+material_parser.add_argument("--cost", type=float, required=True)
+
 args = parser.parse_args()
 
 if args.command == "add":
@@ -108,5 +127,7 @@ elif args.command == "show":
     show_costume(args)
 elif args.command == "status":
     update_status(args)
+elif args.command == "material":
+    add_material(args)
 else:
     parser.print_help()

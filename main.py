@@ -145,59 +145,67 @@ def convert_costume(args):
             round((info["budget"] - spent) * rate, 2), target))
 
 
-parser = argparse.ArgumentParser(description="theWorkshop - cosplay tracker")
-subparsers = parser.add_subparsers(dest="command")
+def main():
+    parser = argparse.ArgumentParser(
+        description="theWorkshop - cosplay tracker")
+    subparsers = parser.add_subparsers(dest="command")
 
-add_parser = subparsers.add_parser("add", help="Add a new cosplay")
-add_parser.add_argument("name", type=str)
-add_parser.add_argument("--budget", type=float, required=True)
+    add_parser = subparsers.add_parser("add", help="Add a new cosplay")
+    add_parser.add_argument("name", type=str)
+    add_parser.add_argument("--budget", type=float, required=True)
 
-subparsers.add_parser("list", help="List all cosplays")
+    subparsers.add_parser("list", help="List all cosplays")
 
-show_parser = subparsers.add_parser("show", help="Show details of a cosplay")
-show_parser.add_argument("name", type=str)
+    show_parser = subparsers.add_parser(
+        "show", help="Show details of a cosplay")
+    show_parser.add_argument("name", type=str)
 
-status_parser = subparsers.add_parser("status", help="Update cosplay status")
-status_parser.add_argument("name", type=str)
-status_parser.add_argument("--set", type=int, required=True)
+    status_parser = subparsers.add_parser(
+        "status", help="Update cosplay status")
+    status_parser.add_argument("name", type=str)
+    status_parser.add_argument("--set", type=int, required=True)
 
-material_parser = subparsers.add_parser(
-    "material", help="Add a material to a cosplay")
-material_parser.add_argument("name", type=str)
-material_parser.add_argument("material", type=str)
-material_parser.add_argument("--cost", type=float, required=True)
+    material_parser = subparsers.add_parser(
+        "material", help="Add a material to a cosplay")
+    material_parser.add_argument("name", type=str)
+    material_parser.add_argument("material", type=str)
+    material_parser.add_argument("--cost", type=float, required=True)
 
-delete_parser = subparsers.add_parser("delete", help="Delete a cosplay")
-delete_parser.add_argument("name", type=str)
+    delete_parser = subparsers.add_parser("delete", help="Delete a cosplay")
+    delete_parser.add_argument("name", type=str)
 
-convert_parser = subparsers.add_parser(
-    "convert", help="Convert cosplay costs to another currency")
-convert_parser.add_argument("name", type=str)
-convert_parser.add_argument("--to", type=str, required=True)
-convert_parser.add_argument("--api-key", type=str,
-                            required=False, default=None)
+    convert_parser = subparsers.add_parser(
+        "convert", help="Convert cosplay costs to another currency")
+    convert_parser.add_argument("name", type=str)
+    convert_parser.add_argument("--to", type=str, required=True)
+    convert_parser.add_argument("--api-key", type=str,
+                                required=False, default=None)
 
-group = convert_parser.add_mutually_exclusive_group()
-group.add_argument("--budget-only", action="store_true",
-                   help="Only show budget conversion")
-group.add_argument("--materials-only", action="store_true",
-                   help="Only show materials/spent conversion")
+    group = convert_parser.add_mutually_exclusive_group()
+    group.add_argument("--budget-only", action="store_true",
+                       help="Only show budget conversion")
+    group.add_argument("--materials-only", action="store_true",
+                       help="Only show materials/spent conversion")
 
-args = parser.parse_args()
+    args = parser.parse_args()
 
-if args.command == "add":
-    add_costume(args)
-elif args.command == "list":
-    list_costume(args)
-elif args.command == "show":
-    show_costume(args)
-elif args.command == "status":
-    update_status(args)
-elif args.command == "material":
-    add_material(args)
-elif args.command == "delete":
-    delete_costume(args)
-elif args.command == "convert":
-    convert_costume(args)
-else:
-    parser.print_help()
+    if args.command == "add":
+        add_costume(args)
+    elif args.command == "list":
+        list_costume(args)
+    elif args.command == "show":
+        show_costume(args)
+    elif args.command == "status":
+        update_status(args)
+    elif args.command == "material":
+        add_material(args)
+    elif args.command == "delete":
+        delete_costume(args)
+    elif args.command == "convert":
+        convert_costume(args)
+    else:
+        parser.print_help()
+
+
+if __name__ == "__main__":
+    main()

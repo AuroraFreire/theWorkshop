@@ -57,11 +57,29 @@ def show_costume(args):
     print("Remaining: {}".format(remaining))
     if remaining < 0:
         print("You are over the budget by {}€!".format(abs(remaining)))
-    print("Materials: ")
+    print("Materials:")
     if not info["materials"]:
-        print("no materials yet")
+        print("  no materials yet")
     for m in info["materials"]:
-        print("- {} | {}€".format(m["name"], m["cost"]))
+        print("  - {} | {}€".format(m["name"], m["cost"]))
+
+
+def update_status(args):
+    data = load_data()
+    if args.name not in data:
+        print("{} not found :/".format(args.name))
+        return
+    status_map = {
+        1: "not-started",
+        2: "in-progress",
+        3: "done"
+    }
+    if args.set not in status_map:
+        print("invalid status! choose from: 1 (not-started), 2 (in-progress), 3 (done)")
+        return
+    data[args.name]["status"] = status_map[args.set]
+    save_data(data)
+    print("Updated {} status to {}".format(args.name, status_map[args.set]))
 
 
 parser = argparse.ArgumentParser(description="theWorkshop - cosplay tracker")
@@ -76,6 +94,10 @@ subparsers.add_parser("list", help="List all cosplays")
 show_parser = subparsers.add_parser("show", help="Show details of a cosplay")
 show_parser.add_argument("name", type=str)
 
+status_parser = subparsers.add_parser("status", help="Update cosplay status")
+status_parser.add_argument("name", type=str)
+status_parser.add_argument("--set", type=int, required=True)
+
 args = parser.parse_args()
 
 if args.command == "add":
@@ -84,5 +106,7 @@ elif args.command == "list":
     list_costume(args)
 elif args.command == "show":
     show_costume(args)
+elif args.command == "status":
+    update_status(args)
 else:
     parser.print_help()

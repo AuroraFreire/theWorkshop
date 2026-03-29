@@ -32,7 +32,7 @@ def add_costume(args):
         args.name, args.budget))
 
 
-def list(args):
+def list_costume(args):
     data = load_data()
     if not data:
         print("No cosplays yet!")
@@ -40,6 +40,28 @@ def list(args):
     for name, info in data.items():
         print("- {} | {} | budget: {}€".format(name,
               info["status"], info["budget"]))
+
+
+def show_costume(args):
+    data = load_data()
+    if args.name not in data:
+        print("{} not found :/".format(args.name))
+        return
+    info = data[args.name]
+    spent = sum(m["cost"] for m in info["materials"])
+    remaining = info["budget"] - spent
+    print("Name: {}".format(args.name))
+    print("Status: {}".format(info["status"]))
+    print("Budget: {}".format(info["budget"]))
+    print("Spent: {}".format(spent))
+    print("Remaining: {}".format(remaining))
+    if remaining < 0:
+        print("You are over the budget by {}€!".format(abs(remaining)))
+    print("Materials: ")
+    if not info["materials"]:
+        print("no materials yet")
+    for m in info["materials"]:
+        print("- {} | {}€".format(m["name"], m["cost"]))
 
 
 parser = argparse.ArgumentParser(description="theWorkshop - cosplay tracker")
@@ -51,11 +73,16 @@ add_parser.add_argument("--budget", type=float, required=True)
 
 subparsers.add_parser("list", help="List all cosplays")
 
+show_parser = subparsers.add_parser("show", help="Show details of a cosplay")
+show_parser.add_argument("name", type=str)
+
 args = parser.parse_args()
 
 if args.command == "add":
     add_costume(args)
 elif args.command == "list":
-    list(args)
+    list_costume(args)
+elif args.command == "show":
+    show_costume(args)
 else:
     parser.print_help()

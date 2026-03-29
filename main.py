@@ -190,3 +190,5 @@ elif args.command == "convert":
     convert_costume(args)
 else:
     parser.print_help()
+
+# yup, it wasnt that hard
